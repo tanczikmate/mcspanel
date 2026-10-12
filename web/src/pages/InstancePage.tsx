@@ -4,6 +4,7 @@ import { authStorage, api } from '../services/api';
 import { useAuth } from '../context/AuthContext';
 import { useDialog } from '../context/DialogContext';
 import { ConsoleViewer, ConsoleLogEntry } from '../components/ConsoleViewer';
+import { Modal } from '../components/Modal';
 import {
   Play,
   Square,
@@ -21,7 +22,9 @@ import {
   UserCheck,
   Loader2,
   Layers,
-  Trash2
+  Trash2,
+  Pencil,
+  Settings
 } from 'lucide-react';
 
 interface InstancePageProps {
@@ -56,6 +59,9 @@ export const InstancePage: React.FC<InstancePageProps> = ({ instanceId, onBack }
   const [autoRestart, setAutoRestart] = useState(false);
   const [startOnBoot, setStartOnBoot] = useState(false);
   const [isUpdatingConfig, setIsUpdatingConfig] = useState(false);
+  const [isRenameModalOpen, setIsRenameModalOpen] = useState(false);
+  const [newNameInput, setNewNameInput] = useState('');
+  const [isRenaming, setIsRenaming] = useState(false);
 
   // Instance users access state (for admins)
   const [instanceUsers, setInstanceUsers] = useState<InstanceUserAccess[]>([]);
@@ -270,6 +276,31 @@ export const InstancePage: React.FC<InstancePageProps> = ({ instanceId, onBack }
     }
   };
 
+  const handleRenameSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = newNameInput.trim();
+    if (!trimmed) {
+      await alert('A szerver neve nem lehet üres!', 'Figyelem', { variant: 'warning' });
+      return;
+    }
+    if (trimmed === instance?.name) {
+      setIsRenameModalOpen(false);
+      return;
+    }
+
+    setIsRenaming(true);
+    try {
+      const res = await api.updateInstance(instanceId, { name: trimmed });
+      setInstance(res.instance);
+      setIsRenameModalOpen(false);
+      await alert('A szerver sikeresen átnevezve!', 'Sikeres módosítás', { variant: 'success' });
+    } catch (e: any) {
+      await alert(e.message || 'Nem sikerült átnevezni a szervert', 'Hiba történt', { variant: 'danger' });
+    } finally {
+      setIsRenaming(false);
+    }
+  };
+
   const handleToggleAutoRestart = async () => {
     const nextVal = !autoRestart;
     setAutoRestart(nextVal);
@@ -422,6 +453,19 @@ export const InstancePage: React.FC<InstancePageProps> = ({ instanceId, onBack }
               <h1 className="text-base sm:text-lg font-bold text-white truncate max-w-[220px] sm:max-w-none">
                 {instance?.name || 'Szerver betöltése...'}
               </h1>
+              {currentUser?.isAdmin && instance && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    setNewNameInput(instance.name);
+                    setIsRenameModalOpen(true);
+                  }}
+                  title="Szerver átnevezése"
+                  className="p-1 rounded-md text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors"
+                >
+                  <Pencil className="w-3.5 h-3.5" />
+                </button>
+              )}
               <span className="inline-flex items-center gap-1 text-xs text-neutral-400 font-mono bg-neutral-900 px-2 py-0.5 rounded-md border border-neutral-800">
                 <Network className="w-3 h-3 text-neutral-400" />
                 :{instance?.port || 25565}
@@ -527,18 +571,6 @@ export const InstancePage: React.FC<InstancePageProps> = ({ instanceId, onBack }
             >
               <Skull className="w-3.5 h-3.5" />
               <span>Kill</span>
-            </button>
-          )}
-
-          {currentUser?.isAdmin && (
-            <button
-              disabled={actionLoading}
-              onClick={handleDeleteInstance}
-              title="Szerver törlése az MCSPanelből"
-              className="inline-flex items-center justify-center gap-1.5 px-3 py-2 sm:py-1.5 rounded-lg text-xs font-semibold bg-neutral-900 text-neutral-400 hover:text-rose-400 hover:bg-rose-950/40 border border-neutral-800 hover:border-rose-800/60 active:scale-95 transition-all disabled:opacity-50"
-            >
-              <Trash2 className="w-3.5 h-3.5" />
-              <span className="hidden sm:inline">Törlés</span>
             </button>
           )}
         </div>
@@ -808,6 +840,124 @@ export const InstancePage: React.FC<InstancePageProps> = ({ instanceId, onBack }
           </div>
         </div>
       )}
+
+      {/* 6. INSTANCE SETTINGS & MANAGEMENT (ADMIN ONLY) */}
+      {currentUser?.isAdmin && (
+        <div className="bg-md-container rounded-2xl border border-md-outlineVariant/40 p-4 sm:p-5 space-y-4">
+          <div>
+            <h2 className="text-sm sm:text-base font-bold text-white flex items-center gap-2">
+              <Settings className="w-4 h-4 text-neutral-400" />
+              <span>Szerver beállítások és kezelés</span>
+            </h2>
+            <p className="text-xs text-neutral-400 mt-0.5">
+              Itt módosíthatod a szerver nevét a panelben, vagy szükség esetén eltávolíthatod a nyilvántartásból.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+            {/* Rename Server Card */}
+            <div className="bg-[#121316] rounded-xl p-4 border border-neutral-800/80 flex flex-col justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 text-white font-semibold text-xs sm:text-sm">
+                  <Pencil className="w-4 h-4 text-neutral-300" />
+                  <span>Szerver átnevezése</span>
+                </div>
+                <p className="text-xs text-neutral-400 mt-1">
+                  Módosítsd a szerver megjelenített nevét az MCSPanel felületén.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setNewNameInput(instance?.name || '');
+                  setIsRenameModalOpen(true);
+                }}
+                disabled={actionLoading}
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-medium text-neutral-200 bg-neutral-800 hover:bg-neutral-700 hover:text-white transition-colors w-full sm:w-auto self-start"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+                <span>Átnevezés</span>
+              </button>
+            </div>
+
+            {/* Delete Server Card */}
+            <div className="bg-[#121316] rounded-xl p-4 border border-rose-950/40 flex flex-col justify-between gap-3">
+              <div>
+                <div className="flex items-center gap-2 text-rose-400 font-semibold text-xs sm:text-sm">
+                  <Trash2 className="w-4 h-4 text-rose-400" />
+                  <span>Szerver törlése a panelből</span>
+                </div>
+                <p className="text-xs text-neutral-400 mt-1">
+                  Eltávolítja a szervert az MCSPanelből. A szerver mappája és fájljai nem törlődnek a lemezről.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={handleDeleteInstance}
+                disabled={actionLoading}
+                className="inline-flex items-center justify-center gap-1.5 px-3.5 py-2 rounded-lg text-xs font-semibold bg-rose-950/40 text-rose-300 hover:text-white hover:bg-rose-950/80 border border-rose-900/60 active:scale-95 transition-all w-full sm:w-auto self-start disabled:opacity-50"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+                <span>Szerver törlése</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* RENAME MODAL */}
+      <Modal
+        isOpen={isRenameModalOpen}
+        onClose={() => setIsRenameModalOpen(false)}
+        className="bg-md-container w-full max-w-md rounded-2xl border border-md-outlineVariant shadow-2xl p-6"
+      >
+        <form onSubmit={handleRenameSubmit}>
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-10 h-10 rounded-xl bg-neutral-800 border border-neutral-700 text-neutral-200 flex items-center justify-center shrink-0">
+              <Pencil className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-base font-bold text-white">Szerver átnevezése</h3>
+              <p className="text-xs text-neutral-400">Add meg a szerver új megjelenített nevét.</p>
+            </div>
+          </div>
+
+          <div className="space-y-3 my-4">
+            <div>
+              <label className="block text-xs font-medium text-neutral-300 mb-1.5">
+                Szerver új neve
+              </label>
+              <input
+                type="text"
+                autoFocus
+                required
+                value={newNameInput}
+                onChange={(e) => setNewNameInput(e.target.value)}
+                placeholder="pl. SMP Túlélő 1.20"
+                className="w-full px-3.5 py-2.5 bg-neutral-900 border border-neutral-700 rounded-xl text-sm text-white placeholder-neutral-500 focus:outline-hidden focus:border-neutral-400 focus:ring-1 focus:ring-neutral-400 transition-all"
+              />
+            </div>
+          </div>
+
+          <div className="flex items-center justify-end gap-2.5 pt-2">
+            <button
+              type="button"
+              onClick={() => setIsRenameModalOpen(false)}
+              className="px-4 py-2.5 rounded-xl text-xs font-medium text-neutral-300 hover:text-white bg-neutral-900 border border-neutral-800 hover:bg-neutral-800 transition-colors"
+            >
+              Mégse
+            </button>
+            <button
+              type="submit"
+              disabled={isRenaming || !newNameInput.trim()}
+              className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl text-xs font-semibold bg-white hover:bg-neutral-200 text-neutral-900 transition-all disabled:opacity-50"
+            >
+              {isRenaming && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+              <span>Mentés</span>
+            </button>
+          </div>
+        </form>
+      </Modal>
     </div>
   );
 };
