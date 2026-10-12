@@ -306,7 +306,14 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = ({
       {canSendCommands && (
         <form
           onSubmit={handleSubmitCommand}
-          className="flex items-center gap-2 bg-[#121316] px-3.5 py-2.5 border-t border-neutral-800/80"
+          onClick={(e) => {
+            if (!(e.target as HTMLElement).closest('button')) {
+              inputRef.current?.focus();
+            }
+          }}
+          className={`flex items-center gap-2 bg-[#121316] px-3.5 py-2 sm:py-2.5 border-t border-neutral-800/80 focus-within:border-neutral-700 focus-within:bg-[#15171c] transition-colors ${
+            isOnline ? 'cursor-text' : 'cursor-default'
+          }`}
         >
           <span className="text-emerald-400 font-mono font-bold text-sm select-none">&gt;</span>
           <input
@@ -325,7 +332,7 @@ export const ConsoleViewer: React.FC<ConsoleViewerProps> = ({
             onChange={(e) => setCommand(e.target.value)}
             onKeyDown={handleKeyDown}
             disabled={!isOnline}
-            className="flex-1 bg-transparent text-xs sm:text-sm font-mono text-white placeholder-neutral-500 focus:outline-none disabled:opacity-40"
+            className="flex-1 bg-transparent py-1 text-xs sm:text-sm font-mono text-white placeholder-neutral-500 focus:outline-none disabled:opacity-40"
           />
           <button
             type="submit"
