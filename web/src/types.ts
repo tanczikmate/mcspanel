@@ -26,10 +26,19 @@ export interface ResourceHistoryPoint {
   memoryMB: number;
 }
 
+export interface JvmHeapStats {
+  usedBytes: number;
+  maxBytes: number;
+  usedFormatted: string;
+  maxFormatted: string;
+  percent: number;
+}
+
 export interface ResourceUsage {
   cpu: number;
   memoryBytes: number;
   memoryFormatted: string;
+  jvmHeap?: JvmHeapStats | null;
   players?: {
     online: number;
     max: number;

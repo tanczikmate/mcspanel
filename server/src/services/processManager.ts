@@ -169,6 +169,7 @@ export class ProcessManager {
         cpu: 0,
         memoryBytes: 0,
         memoryFormatted: '0 MB',
+        jvmHeap: null,
         players: { online: 0, max: 20, names: [] },
         version: holder?.version || null
       };
@@ -198,6 +199,7 @@ export class ProcessManager {
           cpu: 0,
           memoryBytes: 0,
           memoryFormatted: '0 MB',
+          jvmHeap: null,
           players: { online: 0, max: 20, names: [] },
           version: holder?.version || null
         };

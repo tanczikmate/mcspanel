@@ -131,11 +131,17 @@ export const ServerCard: React.FC<ServerCardProps> = ({
 
         {/* Resource Usage Mini Badges if Running */}
         {isOnline && instance.resourceUsage && (
-          <div className="flex items-center gap-3 mb-2 text-xs text-neutral-400">
+          <div className="flex items-center gap-2 mb-2 text-xs text-neutral-400">
             <div className="flex items-center gap-1 bg-neutral-900/80 px-2 py-0.5 rounded-md border border-neutral-800">
               <HardDrive className="w-3 h-3 text-emerald-400" />
               <span className="font-mono text-neutral-200">{instance.resourceUsage.memoryFormatted} RAM</span>
             </div>
+            {instance.resourceUsage.jvmHeap && (
+              <div className="hidden sm:flex items-center gap-1 bg-neutral-900/80 px-2 py-0.5 rounded-md border border-neutral-800 text-[11px]">
+                <span className="text-neutral-400">Heap:</span>
+                <span className="font-mono text-neutral-200">{instance.resourceUsage.jvmHeap.usedFormatted}</span>
+              </div>
+            )}
           </div>
         )}
       </div>
@@ -189,9 +195,10 @@ export const ServerCard: React.FC<ServerCardProps> = ({
               disabled={actionLoading}
               onClick={(e) => handleAction(e, onRestart)}
               title="Újraindítás"
-              className="p-1.5 rounded-lg text-neutral-400 hover:text-white hover:bg-neutral-800 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 hover:bg-amber-500/20 active:scale-95 transition-all disabled:opacity-50"
             >
               <RotateCw className="w-3.5 h-3.5" />
+              <span>Újraindítás</span>
             </button>
           )}
         </div>

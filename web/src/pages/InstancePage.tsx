@@ -52,6 +52,7 @@ export const InstancePage: React.FC<InstancePageProps> = ({ instanceId, onBack }
     cpu: 0,
     memoryBytes: 0,
     memoryFormatted: '0 MB',
+    jvmHeap: null,
     players: { online: 0, max: 20, names: [] }
   });
   const [isConnected, setIsConnected] = useState(false);
@@ -546,7 +547,7 @@ export const InstancePage: React.FC<InstancePageProps> = ({ instanceId, onBack }
             <button
               disabled={actionLoading}
               onClick={() => handleAction(() => api.restartInstance(instanceId))}
-              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-lg text-xs font-medium text-neutral-300 hover:text-white bg-neutral-800 hover:bg-neutral-700 transition-colors disabled:opacity-50"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-1.5 px-3.5 py-2 sm:py-1.5 rounded-lg text-xs font-semibold bg-amber-500/15 text-amber-400 border border-amber-500/30 hover:bg-amber-500/25 active:scale-95 transition-all disabled:opacity-50"
             >
               <RotateCw className="w-3.5 h-3.5" />
               <span>Újraindítás</span>
@@ -613,8 +614,15 @@ export const InstancePage: React.FC<InstancePageProps> = ({ instanceId, onBack }
             <span className="text-[11px] font-semibold uppercase tracking-wider">Memória (RAM)</span>
             <HardDrive className="w-4 h-4 text-neutral-400" />
           </div>
-          <div className="text-base sm:text-xl font-bold font-mono text-white">
-            {isOnline ? usage.memoryFormatted : '0 MB'}
+          <div>
+            <div className="text-base sm:text-xl font-bold font-mono text-white">
+              {isOnline ? usage.memoryFormatted : '0 MB'}
+            </div>
+            {isOnline && usage.jvmHeap && (
+              <div className="text-[10px] text-neutral-400 truncate mt-0.5" title={`JVM Heap: ${usage.jvmHeap.usedFormatted} / ${usage.jvmHeap.maxFormatted}`}>
+                Heap: {usage.jvmHeap.usedFormatted} / {usage.jvmHeap.maxFormatted}
+              </div>
+            )}
           </div>
         </div>
 
