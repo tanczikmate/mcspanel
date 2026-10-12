@@ -1,0 +1,41 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "MCSPanel Configuration",
+  "description": "MCSPanel központi konfigurációs beállításai",
+  "type": "object",
+  "properties": {
+    "$schema": {
+      "type": "string",
+      "description": "JSON séma elérési útja az automatikus kódkiegészítéshez és validációhoz."
+    },
+    "port": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 65535,
+      "default": 24565,
+      "description": "A webes kezelőfelület és a REST/WebSocket API HTTP portja (pl. 24565 éles környezethez, vagy 24566 tesztkörnyezethez)."
+    },
+    "host": {
+      "type": "string",
+      "default": "0.0.0.0",
+      "description": "A hálózati IP-cím, amin a szerver figyel (0.0.0.0 = elérhető helyben és a helyi hálózaton is, 127.0.0.1 = kizárólag a helyi gépen)."
+    },
+    "dataDir": {
+      "type": "string",
+      "default": "data",
+      "description": "Az adatbázis és a belső fájlok mappája (pl. 'data' éles környezethez, vagy 'data-test' tesztkörnyezethez)."
+    },
+    "openBrowserOnStart": {
+      "type": "boolean",
+      "default": true,
+      "description": "Automatikusan nyissa-e meg a böngészőt a vezérlőpult indításakor (start.bat / start.sh)."
+    },
+    "environment": {
+      "type": "string",
+      "enum": ["production", "development", "test"],
+      "default": "production",
+      "description": "Környezet típusa (production = éles, test = tesztkörnyezet, development = fejlesztői)."
+    }
+  },
+  "additionalProperties": true
+}

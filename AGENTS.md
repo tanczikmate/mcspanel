@@ -18,9 +18,14 @@ Az **MCSPanel** egy monorepo felépítésű, pehelykönnyű és modern Minecraft
   - **Stílus:** TailwindCSS (Material Design 3 monokróm szürke-fekete felületek, mobil-első reszponzivitás alsó navigációs sávval).
   - **Konzol:** `xterm.js` natív integráció ANSI színkódokkal és parancselőzményekkel.
   - **PWA:** Service Worker és Manifest támogatás mobil és asztali telepítéshez.
-- **Portok:**
-  - Production (Backend + beágyazott SPA frontend): `http://localhost:24565` (konfigurálható a `PORT` és `HOST` env változókkal).
-  - Development (Vite HMR): `http://localhost:5173`.
+- **Portok & Konfiguráció (`config.json`):**
+  - Központi konfigurációs fájl a gyökérkönyvtárban: `config.json` (validációval: `config.schema.json`).
+  - Beállítások: `port` (alapértelmezett: 24565), `host` ("0.0.0.0"), `dataDir` ("data"), `openBrowserOnStart` (true), `environment` ("production" / "test").
+  - **Több környezet (Éles vs. Teszt) egyazon gépen:**
+    - Éles környezet: `config.json` (`port: 24565`, mappa: `data/`) -> `start.bat` & `stop.bat`
+    - Teszt környezet: `config.test.json` (`port: 24566`, mappa: `data-test/`) -> `start-test.bat` & `stop-test.bat`
+    - A launcher és leállító szkriptek (`.bat`, `.sh`) dinamikusan a megfelelő konfigurációból olvassák ki a portot, így a két környezet teljes adatbázis- és port-izolációval futhat egymás mellett.
+  - Development (Vite HMR): `http://localhost:5173` (automatikusan a `config.json`-ban megadott portra proxizik).
 
 ---
 

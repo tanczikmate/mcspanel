@@ -10,6 +10,7 @@ out/
 
 # Database & Runtime data
 data/
+data-*/
 *.db
 *.db-journal
 *.db-wal
@@ -19,6 +20,8 @@ data/
 .env
 .env.local
 .env.*.local
+config.local.json
+config.test.json
 
 # Logs
 logs/

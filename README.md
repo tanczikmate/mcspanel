@@ -183,17 +183,42 @@ Amikor először nyitod meg a felületet (`http://localhost:24565`), a rendszer 
 
 ---
 
-## 🔧 Konfiguráció & Környezeti Változók
+## 🔧 Konfiguráció & Tesztkörnyezet (`config.json`)
 
-Az alkalmazás nulla konfigurációval is azonnal működik, de a viselkedése testreszabható `.env` fájllal a projekt gyökerében:
+Az alkalmazás nulla konfigurációval is azonnal működik, a viselkedése azonban egyszerűen testreszabható a gyökérkönyvtárban lévő **`config.json`** fájlban (amelyhez a szerkesztőkben teljes kódkiegészítést ad a `config.schema.json`):
 
-| Változó | Alapérték | Leírás |
+```json
+{
+  "$schema": "./config.schema.json",
+  "port": 24565,
+  "host": "0.0.0.0",
+  "dataDir": "data",
+  "openBrowserOnStart": true,
+  "environment": "production"
+}
+```
+
+### ⚙️ Beállítási lehetőségek:
+| Kulcs | Alapérték | Leírás |
 | :--- | :--- | :--- |
-| `PORT` | `24565` | A webes kezelőfelület és REST API HTTP/WebSocket portja. |
-| `HOST` | `0.0.0.0` | Címkötés (`0.0.0.0` = a helyi hálózatról és a gépről is elérhető; `127.0.0.1` = csak localhost). |
-| `DATA_DIR` | `./data` | Az SQLite adatbázis és a perzisztens fájlok tárolási könyvtára. |
-| `JWT_SECRET` | *(automatikus)* | Munkamenet titkosítási kulcs. Ha üres, az első indításkor egy biztonságos 64 bájtos random kulcs generálódik a `data/.jwt_secret` fájlba. |
-| `NODE_ENV` | `development` | Futtatási mód (`production` vagy `development`). |
+| `port` | `24565` | A webes kezelőfelület és REST API HTTP/WebSocket portja. |
+| `host` | `0.0.0.0` | Címkötés (`0.0.0.0` = helyi hálózatról is elérhető; `127.0.0.1` = csak localhost). |
+| `dataDir` | `data` | Az SQLite adatbázis (`mcspanel.db`) és munkamenet fájlok tárolási könyvtára. |
+| `openBrowserOnStart` | `true` | Automatikusan megnyissa-e az alapértelmezett böngészőt indításkor. |
+| `environment` | `production` | Futtatási mód (`production`, `development`, `test`). |
+
+---
+
+### 🧪 Éles és Tesztkörnyezet párhuzamos futtatása egy gépen
+
+A rendszer lehetővé teszi, hogy egyetlen számítógépen egyszerre fusson a hivatalos éles panel és egy elszeparált tesztkörnyezet:
+
+- **Éles környezet:**
+  - Indítás: [`start.bat`](file:///C:/Users/matet/WebstormProjects/mcspanel/start.bat) -> Port: `24565`, Adatbázis: `data/`
+  - Leállítás: [`stop.bat`](file:///C:/Users/matet/WebstormProjects/mcspanel/stop.bat)
+- **Teszt környezet:**
+  - Indítás: [`start-test.bat`](file:///C:/Users/matet/WebstormProjects/mcspanel/start-test.bat) -> Port: `24566`, Adatbázis: `data-test/` (automatikusan létrehozza a `config.test.json` profilt)
+  - Leállítás: [`stop-test.bat`](file:///C:/Users/matet/WebstormProjects/mcspanel/stop-test.bat) (vagy `stop.bat 24566`)
 
 ---
 

@@ -1,4 +1,5 @@
 @echo off
+setlocal enabledelayedexpansion
 title MCSPanel - Minecraft Server Platform
 color 0F
 chcp 65001 >nul
@@ -12,7 +13,7 @@ echo.
 
 :: 1. Check if Node.js is installed
 where node >nul 2>nul
-if %errorlevel% neq 0 (
+if !errorlevel! neq 0 (
     echo [HIBA] A Node.js nem található a gépeden!
     echo Kérlek telepítsd a legfrissebb Node.js-t innen: https://nodejs.org
     echo.
@@ -22,10 +23,10 @@ if %errorlevel% neq 0 (
 
 :: 2. Check if build outputs exist, if not, build project
 if not exist "web\dist\index.html" (
-    echo [INFO] Első indítás észlelve, projekt lefordítása folyamatban...
+    echo [INFO] Első indítás észlelve, frontend lefordítása folyamatban...
     echo.
     call npm run build
-    if %errorlevel% neq 0 (
+    if !errorlevel! neq 0 (
         echo [HIBA] A fordítás sikertelen volt!
         pause
         exit /b 1
@@ -36,21 +37,33 @@ if not exist "web\dist\index.html" (
 if not exist "server\dist\index.js" (
     echo [INFO] Szerver fordítása folyamatban...
     call npm --workspace=server run build
-    if %errorlevel% neq 0 (
+    if !errorlevel! neq 0 (
         echo [HIBA] A szerver fordítása sikertelen volt!
         pause
         exit /b 1
     )
 )
 
+:: 3. Read configuration (port, openBrowserOnStart)
+set PORT=
+set OPEN_BROWSER=
+for /f "tokens=1,2" %%a in ('node -e "try { const c = JSON.parse(require('fs').readFileSync('./config.json','utf8')); console.log((c.port || 24565) + ' ' + (c.openBrowserOnStart !== false ? '1' : '0')); } catch { console.log('24565 1'); }"' ) do (
+    set PORT=%%a
+    set OPEN_BROWSER=%%b
+)
+if "!PORT!"=="" set PORT=24565
+if "!OPEN_BROWSER!"=="" set OPEN_BROWSER=1
+
 echo [OK] MCSPanel indítása...
-echo [INFO] A weboldal elérhető: http://localhost:24565
+echo [INFO] A weboldal elérhető: http://localhost:!PORT!
 echo.
 
-:: 3. Open browser after short delay in background
-start "" cmd /c "timeout /t 2 /nobreak >nul && start http://localhost:24565"
+:: 4. Open browser after short delay in background if enabled
+if "!OPEN_BROWSER!"=="1" (
+    start "" cmd /c "timeout /t 2 /nobreak >nul && start http://localhost:!PORT!"
+)
 
-:: 4. Start MCSPanel backend
+:: 5. Start MCSPanel backend
 node server/dist/index.js
 
 pause
