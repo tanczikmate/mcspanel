@@ -19,13 +19,12 @@ Az **MCSPanel** egy monorepo felépítésű, pehelykönnyű és modern Minecraft
   - **Konzol:** `xterm.js` natív integráció ANSI színkódokkal és parancselőzményekkel.
   - **PWA:** Service Worker és Manifest támogatás mobil és asztali telepítéshez.
 - **Portok & Konfiguráció (`config.json`):**
-  - Központi konfigurációs fájl a gyökérkönyvtárban: `config.json` (validációval: `config.schema.json`).
-  - Beállítások: `port` (alapértelmezett: 24565), `host` ("0.0.0.0"), `dataDir` ("data"), `openBrowserOnStart` (true), `environment` ("production" / "test").
-  - **Több környezet (Éles vs. Teszt) egyazon gépen:**
-    - Éles környezet: `config.json` (`port: 24565`, mappa: `data/`) -> `start.bat` & `stop.bat`
-    - Teszt környezet: `config.test.json` (`port: 24566`, mappa: `data-test/`) -> `start-test.bat` & `stop-test.bat`
-    - A launcher és leállító szkriptek (`.bat`, `.sh`) dinamikusan a megfelelő konfigurációból olvassák ki a portot, így a két környezet teljes adatbázis- és port-izolációval futhat egymás mellett.
-  - Development (Vite HMR): `http://localhost:5173` (automatikusan a `config.json`-ban megadott portra proxizik).
+  - Központi konfigurációs fájl a gyökérkönyvtárban: `config.json` (validációval: `config.schema.json`). Sablon: `config.example.json`.
+  - **Fontos:** A `config.json` a `.gitignore`-ban van, így a lokális beállítások nem kerülnek fel a GitHubra!
+  - **🚨 KÖRNYEZETI SZABÁLYZAT (Éles vs. Teszt):**
+    - **Éles (Production) környezet:** A felhasználó gépén a `C:/mcspanel` mappában fut a `24565`-ös porton. **Szigorúan tilos bármelyik AI ágensnek a `C:/mcspanel` mappához vagy annak fájljaihoz nyúlnia!**
+    - **Teszt (Test) környezet:** A jelenlegi WebStorm munkakönyvtár (`C:\Users\matet\WebstormProjects\mcspanel`) a tesztkörnyezet, amely a **`24566`**-os porton fut (`config.json`-ban: `"port": 24566, "environment": "test"`).
+  - Development (Vite HMR): `http://localhost:5173` (automatikusan a `config.json`-ban megadott backend portra proxizik).
 
 ---
 

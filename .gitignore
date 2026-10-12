@@ -20,6 +20,7 @@ data-*/
 .env
 .env.local
 .env.*.local
+config.json
 config.local.json
 config.test.json
 

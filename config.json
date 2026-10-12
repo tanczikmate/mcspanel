@@ -1,8 +1,0 @@
-{
-  "$schema": "./config.schema.json",
-  "port": 24565,
-  "host": "0.0.0.0",
-  "dataDir": "data",
-  "openBrowserOnStart": true,
-  "environment": "production"
-}
