@@ -1,4 +1,4 @@
-@echo off
+﻿@echo off
 setlocal enabledelayedexpansion
 title MCSPanel - Minecraft Server Platform
 color 0F
