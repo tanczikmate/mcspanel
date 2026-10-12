@@ -159,7 +159,7 @@ async function getWindowsProcessDetails(pids: number[]): Promise<{ totalPrivateM
     $pids = @(${pids.join(',')});
     $procs = $pids | ForEach-Object { try { Get-Process -Id $_ -ErrorAction Stop } catch {} };
     $mem = ($procs | Measure-Object -Property PrivateMemorySize64 -Sum).Sum;
-    $javaProc = $procs | Where-Object { $_.ProcessName -like '*java*' } | Select-Object -First 1;
+    $javaProc = $procs | Where-Object { $_.ProcessName -like '*java*' } | Sort-Object -Property PrivateMemorySize64 -Descending | Select-Object -First 1;
     $res = @{
       mem = if ($mem) { [int64]$mem } else { 0 };
       javaPid = if ($javaProc) { $javaProc.Id } else { $null };
@@ -190,6 +190,25 @@ async function queryJvmHeap(javaPid: number, javaPath: string | null): Promise<J
     if (fs.existsSync(candidate)) {
       jcmdBin = candidate;
     }
+  }
+
+  if (!jcmdBin && process.platform === 'win32') {
+    try {
+      const javaDirs = ['C:\\Program Files\\Java', 'C:\\Program Files (x86)\\Java'];
+      for (const jDir of javaDirs) {
+        if (fs.existsSync(jDir)) {
+          const entries = fs.readdirSync(jDir);
+          for (const ent of entries) {
+            const jcmdCandidate = path.join(jDir, ent, 'bin', 'jcmd.exe');
+            if (fs.existsSync(jcmdCandidate)) {
+              jcmdBin = jcmdCandidate;
+              break;
+            }
+          }
+        }
+        if (jcmdBin) break;
+      }
+    } catch {}
   }
 
   if (!jcmdBin && process.env.JAVA_HOME) {
