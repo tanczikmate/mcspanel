@@ -1,0 +1,7 @@
+# Ensure batch scripts and VBScript always use CRLF line endings on checkout
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.vbs text eol=crlf
+
+# Ensure shell scripts always use LF line endings
+*.sh text eol=lf

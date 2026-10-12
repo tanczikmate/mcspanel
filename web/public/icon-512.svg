@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <rect width="512" height="512" rx="128" fill="#111215"/>
+  <rect x="32" y="32" width="448" height="448" rx="96" stroke="#2D2F36" stroke-width="8"/>
+  <!-- Minecraft Cube Isometric Wireframe / MD3 Theme -->
+  <path d="M256 96L400 178V334L256 416L112 334V178L256 96Z" fill="#1B1C22" stroke="#E2E2E6" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M256 96V256M400 178L256 256M112 178L256 256" stroke="#E2E2E6" stroke-width="12" stroke-linejoin="round"/>
+  <path d="M256 256V416" stroke="#E2E2E6" stroke-width="12"/>
+  <!-- Terminal Prompt Symbol Inside Cube -->
+  <path d="M190 200L225 225L190 250" stroke="#34D399" stroke-width="14" stroke-linecap="round" stroke-linejoin="round"/>
+  <line x1="235" y1="250" x2="265" y2="250" stroke="#E2E2E6" stroke-width="14" stroke-linecap="round"/>
+</svg>

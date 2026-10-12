@@ -1,0 +1,26 @@
+{
+  "name": "mcspanel",
+  "version": "1.0.0",
+  "description": "MCSPanel - Modern Minecraft Server Manager",
+  "private": true,
+  "workspaces": [
+    "server",
+    "web"
+  ],
+  "scripts": {
+    "dev:server": "npm --workspace=server run dev",
+    "dev:web": "npm --workspace=web run dev",
+    "build:server": "npm --workspace=server run build",
+    "build:web": "npm --workspace=web run build",
+    "build": "npm run build:server && npm run build:web",
+    "test": "npm --workspace=server run test",
+    "start": "npm --workspace=server run start"
+  },
+  "keywords": [
+    "minecraft",
+    "server-manager",
+    "mcspanel"
+  ],
+  "author": "",
+  "license": "MIT"
+}
