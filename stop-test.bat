@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 setlocal enabledelayedexpansion
 title MCSPanel [TESZT KORNYEZET LEALLITAS]
 chcp 65001 >nul

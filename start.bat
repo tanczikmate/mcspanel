@@ -1,4 +1,4 @@
-﻿@echo off
+@echo off
 setlocal enabledelayedexpansion
 title MCSPanel - Minecraft Server Platform
 color 0F
@@ -21,9 +21,23 @@ if !errorlevel! neq 0 (
     exit /b 1
 )
 
-:: 2. Check if build outputs exist, if not, build project
+:: 2. Check if dependencies are installed
+if not exist "node_modules\" (
+    echo [INFO] Függőségek nincsenek telepítve, npm install futtatása...
+    echo.
+    call npm install
+    if !errorlevel! neq 0 (
+        echo [HIBA] A függőségek telepítése sikertelen volt!
+        pause
+        exit /b 1
+    )
+    echo [OK] Függőségek sikeresen telepítve.
+    echo.
+)
+
+:: 3. Check if build outputs exist, if not, build project
 if not exist "web\dist\index.html" (
-    echo [INFO] Első indítás észlelve, frontend lefordítása folyamatban...
+    echo [INFO] Első indítás észlelve, projekt lefordítása folyamatban...
     echo.
     call npm run build
     if !errorlevel! neq 0 (
@@ -31,6 +45,7 @@ if not exist "web\dist\index.html" (
         pause
         exit /b 1
     )
+    echo [OK] Projekt sikeresen felépítve.
     echo.
 )
 
@@ -44,7 +59,14 @@ if not exist "server\dist\index.js" (
     )
 )
 
-:: 3. Read configuration (port, openBrowserOnStart)
+:: 4. Ensure config.json exists from template
+if not exist "config.json" (
+    if exist "config.example.json" (
+        copy /y "config.example.json" "config.json" >nul 2>&1
+    )
+)
+
+:: 5. Read configuration (port, openBrowserOnStart)
 set PORT=
 set OPEN_BROWSER=
 for /f "tokens=1,2" %%a in ('node -e "try { const c = JSON.parse(require('fs').readFileSync('./config.json','utf8')); console.log((c.port || 24565) + ' ' + (c.openBrowserOnStart !== false ? '1' : '0')); } catch { console.log('24565 1'); }"' ) do (
@@ -58,12 +80,12 @@ echo [OK] MCSPanel indítása...
 echo [INFO] A weboldal elérhető: http://localhost:!PORT!
 echo.
 
-:: 4. Open browser after short delay in background if enabled
+:: 6. Open browser after short delay in background if enabled
 if "!OPEN_BROWSER!"=="1" (
     start "" cmd /c "timeout /t 2 /nobreak >nul && start http://localhost:!PORT!"
 )
 
-:: 5. Start MCSPanel backend
+:: 7. Start MCSPanel backend
 node server/dist/index.js
 
 pause
